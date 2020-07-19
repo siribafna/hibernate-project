@@ -96,8 +96,15 @@ public class CustomerPersistenceServiceImpl implements CustomerPersistenceServic
 	}
 
 	@Override
-	public List<Customer> retrieveByZipCode(String zipCode) throws SQLException, DAOException {
-		return null;
+	public List<Customer> retrieveByZipCode(String zipCode) throws SQLException, DAOException 
+	{
+	
+		List<Customer> custs = (List<Customer>) em.createQuery("from Customer as c where c.addressList.zipcode = :zip")
+		.setParameter("zip", zipCode)
+		.getResultList();
+
+		return custs;
+
 	}
 
 	@Override
