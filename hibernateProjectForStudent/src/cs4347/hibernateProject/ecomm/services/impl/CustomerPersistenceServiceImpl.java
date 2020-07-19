@@ -80,7 +80,19 @@ public class CustomerPersistenceServiceImpl implements CustomerPersistenceServic
 	}
 
 	@Override
-	public void delete(Long id) throws SQLException, DAOException {
+	public void delete(Long id) throws SQLException, DAOException 
+	{
+		em.getTransaction().begin();
+		Customer customer = (Customer) em.createQuery("from Customer as p where p.id = :id").setParameter("id", id)
+				.getSingleResult();
+
+		if (customer == null) {
+			em.getTransaction().rollback();
+			throw new DAOException("Customer ID Not Found " + id);
+		}
+
+		em.remove(customer); // Does this work?
+		em.getTransaction().commit();
 	}
 
 	@Override
@@ -89,7 +101,13 @@ public class CustomerPersistenceServiceImpl implements CustomerPersistenceServic
 	}
 
 	@Override
-	public List<Customer> retrieveByDOB(Date startDate, Date endDate) throws SQLException, DAOException {
-		return null;
+	public List<Customer> retrieveByDOB(Date startDate, Date endDate) throws SQLException, DAOException 
+	{
+		List<Customer> cust = em.createQuery("from Customer as c where c.dob between :start and :end")
+				.setParameter("start", startDate)
+				.setParameter("end", endDate)
+				.getResultList();
+		
+		return cust;
 	}
 }
